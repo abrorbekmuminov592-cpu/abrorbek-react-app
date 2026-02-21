@@ -1,24 +1,29 @@
-import { useState } from 'react' // SHU QATORNI QO'SHING
+import { useState } from 'react'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0) // SHU QATORNI QO'SHING
+  const [count, setCount] = useState(0)
 
   return (
-    <>
-      <h1>Abrorbek birinchi loyihasi React!</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
+    <div className="portfolio">
+      <h1>Salom, men Abrorbekman!</h1>
+      <p className="subtitle">Bu mening React-dagi birinchi professional saytim.</p>
+      
+      <div className="info-card">
+        <h3>Men haqimda:</h3>
+        <ul>
+          <li>🚀 Kelajakda kuchli dasturchi bo'laman</li>
+          <li>💻 React va JavaScript o'rganyapman</li>
+          <li>🌍 Saytim butun dunyoga ko'rinyapti!</li>
+        </ul>
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+
+      <div className="counter-section">
+        <button onClick={() => setCount((count) => count + 1)}>
+          Saytimga {count} marta qarsak chalindi 👏
+        </button>
+      </div>
+    </div>
   )
 }
 
