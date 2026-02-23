@@ -1,56 +1,69 @@
-import React, { useState } from 'react'
-import axios from 'axios'
-import './App.css'
+import React, { useState } from 'react';
+
+const api = {
+  key: "d748ca49a12461f80137c4ba2cd5b185", // O'zingizning API kalitingizni shu yerga qo'ying
+  base: "https://api.openweathermap.org/data/2.5/"
+};
 
 function App() {
-  const [city, setCity] = useState("")
-  const [weather, setWeather] = useState(null)
-  const [loading, setLoading] = useState(false)
+  const [query, setQuery] = useState('');
+  const [weather, setWeather] = useState({});
 
-  // O'sha saytdan olgan kalitingizni mana shu qo'shtirnoq ichiga qo'ying
-  const API_KEY = "d748ca49a12461f80137c4ba2cd5b185" 
-
-  const searchWeather = async () => {
-    if (!city) return
-    setLoading(true)
-    try {
-      const res = await axios.get(
-        `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${API_KEY}&lang=uz`
-      )
-      setWeather(res.data)
-    } catch (error) {
-      alert("Shahar topilmadi! Iltimos, nomini to'g'ri yozing.")
+  const search = evt => {
+    if (evt.key === "Enter") {
+      fetch(`${api.base}weather?q=${query}&units=metric&APPID=${api.key}&lang=uz`)
+        .then(res => res.json())
+        .then(result => {
+          setWeather(result);
+          setQuery('');
+        });
     }
-    setLoading(false)
-  }
+  };
+
+  const getLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition((position) => {
+        const { latitude, longitude } = position.coords;
+        fetch(`${api.base}weather?lat=${latitude}&lon=${longitude}&units=metric&APPID=${api.key}&lang=uz`)
+          .then(res => res.json())
+          .then(result => {
+            setWeather(result);
+            setQuery('');
+          });
+      });
+    }
+  };
 
   return (
-    <div className="weather-container">
-      <div className="weather-card">
-        <h1>Ob-havo ☁️</h1>
+    <div className={(typeof weather.main != "undefined") ? ((weather.main.temp > 16) ? 'app warm' : 'app') : 'app'}>
+      <main>
         <div className="search-box">
           <input 
-            type="text" 
-            placeholder="Shahar nomi (masalan: Tashkent)" 
-            onChange={(e) => setCity(e.target.value)}
+            type="text"
+            className="search-bar"
+            placeholder="Shahar nomi..."
+            onChange={e => setQuery(e.target.value)}
+            value={query}
+            onKeyPress={search}
           />
-          <button onClick={searchWeather}>{loading ? "..." : "🔍"}</button>
+          <button onClick={getLocation} style={{marginTop: '10px', padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer', background: 'rgba(255,255,255,0.5)'}}>
+            📍 Mening joyim
+          </button>
         </div>
-
-        {weather && (
-          <div className="info">
-            <h2>{weather.name} 🇺🇿</h2>
-            <div className="temp">{Math.round(weather.main.temp)}°C</div>
-            <p className="desc">{weather.weather[0].description}</p>
-            <div className="details">
-              <p>💧 Namlik: {weather.main.humidity}%</p>
-              <p>💨 Shamol: {weather.wind.speed} m/s</p>
-            </div>
+        {(typeof weather.main != "undefined") ? (
+        <div>
+          <div className="location-box">
+            <div className="location">{weather.name}, {weather.sys.country}</div>
           </div>
-        )}
-      </div>
+          <div className="weather-box">
+            <div className="temp">{Math.round(weather.main.temp)}°c</div>
+            <div className="weather">{weather.weather[0].description}</div>
+          </div>
+        </div>
+        ) : ('')}
+      </main>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
